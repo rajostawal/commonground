@@ -1,26 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ─── Background layers ─────────────────────────────── */
+  --color-bg-base:      #0a0a0a;
+  --color-bg-surface-1: #111111;
+  --color-bg-surface-2: #1a1a1a;
+  --color-bg-surface-3: #222222;
+
+  /* ─── Border ─────────────────────────────────────────── */
+  --color-border-subtle:  rgba(255,255,255,0.06);
+  --color-border-default: rgba(255,255,255,0.10);
+  --color-border-strong:  rgba(255,255,255,0.16);
+
+  /* ─── Text ───────────────────────────────────────────── */
+  --color-text-primary:   #f2f2f2;
+  --color-text-secondary: #a0a0a0;
+  --color-text-muted:     #666666;
+  --color-text-disabled:  #444444;
+
+  /* ─── Accent (muted dark blue-gray) ─────────────────── */
+  --color-accent:         #5b7fa6;
+  --color-accent-hover:   #6b8fb6;
+  --color-accent-focus:   #5b7fa6;
+  --color-accent-muted:   rgba(91,127,166,0.12);
+
+  /* ─── Semantic ───────────────────────────────────────── */
+  --color-success:        #2d6a4f;
+  --color-success-bg:     #0d2818;
+  --color-warning:        #b5770d;
+  --color-warning-bg:     #2d1f04;
+  --color-error:          #c0392b;
+  --color-error-bg:       #2d0d0a;
+  --color-info:           #2563eb;
+  --color-info-bg:        #0d1a2d;
+
+  /* ─── Fonts ───────────────────────────────────────────── */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base styles ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+/* ── Focus ring (consistent, accent-colored) ─────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-focus);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar (minimal, dark) ───────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* ── Utility: hide scrollbar visually but keep scroll ── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Safe area padding for mobile ────────────────────── */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
