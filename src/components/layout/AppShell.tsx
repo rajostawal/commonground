@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { BottomNav } from "./BottomNav";
+import { UpgradeBanner } from "@/components/features/UpgradeBanner";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0 pb-[60px] md:pb-0">
+        <UpgradeBanner />
         {children}
       </main>
 

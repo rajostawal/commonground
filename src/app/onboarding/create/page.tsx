@@ -33,7 +33,7 @@ export default function CreateHouseholdPage() {
     try {
       await createHousehold({ name: name.trim(), defaultCurrency: currency });
       toast({ title: "Household created!", variant: "success" });
-      router.push("/home");
+      router.push("/bulletin-board");
     } catch (err: unknown) {
       const e = err as Error;
       setError(e.message ?? "Failed to create household");

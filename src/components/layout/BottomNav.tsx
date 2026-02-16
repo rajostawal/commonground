@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, DollarSign, CheckSquare, Calendar, MoreHorizontal } from "lucide-react";
+import { ClipboardList, ShoppingCart, CheckSquare, Wallet, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/expenses", label: "Expenses", icon: DollarSign },
+  { href: "/bulletin-board", label: "Board", icon: ClipboardList },
+  { href: "/shopping-list", label: "Shopping", icon: ShoppingCart },
   { href: "/chores", label: "Chores", icon: CheckSquare },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
-  { href: "/more", label: "More", icon: MoreHorizontal },
+  { href: "/finances", label: "Finances", icon: Wallet },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function BottomNav() {
@@ -21,8 +21,8 @@ export function BottomNav() {
       <div className="flex pb-safe">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
-            href === "/home"
-              ? pathname === "/home" || pathname === "/"
+            href === "/bulletin-board"
+              ? pathname === "/bulletin-board" || pathname === "/"
               : pathname.startsWith(href);
 
           return (

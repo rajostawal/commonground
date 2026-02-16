@@ -18,6 +18,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ClerkProvider
+          signInFallbackRedirectUrl="/bulletin-board"
+          signUpFallbackRedirectUrl="/bulletin-board"
           appearance={{
             variables: {
               colorBackground: "#0a0a0a",

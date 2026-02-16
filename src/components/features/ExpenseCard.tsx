@@ -69,7 +69,7 @@ export function ExpenseCard({ expense, currentUserId, currency }: ExpenseCardPro
 
         {/* Description + meta */}
         <div className="flex-1 min-w-0">
-          <Link href={`/expenses/${expense._id}`} className="hover:underline">
+          <Link href={`/finances/${expense._id}`} className="hover:underline">
             <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
               {expense.description}
             </p>
@@ -98,7 +98,7 @@ export function ExpenseCard({ expense, currentUserId, currency }: ExpenseCardPro
 
         {/* Actions (visible on hover on desktop) */}
         <div className="shrink-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Link href={`/expenses/${expense._id}`}>
+          <Link href={`/finances/${expense._id}`}>
             <Button variant="ghost" size="icon" aria-label="Edit expense">
               <Pencil className="h-3.5 w-3.5" />
             </Button>

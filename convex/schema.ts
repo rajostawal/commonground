@@ -8,8 +8,19 @@ export default defineSchema({
     email: v.string(),
     name: v.string(),
     imageUrl: v.optional(v.string()),
-    aiEnabled: v.boolean(),
     createdAt: v.number(),
+    // Subscription fields (Polar)
+    polarCustomerId: v.optional(v.string()),
+    polarSubscriptionId: v.optional(v.string()),
+    subscriptionStatus: v.optional(
+      v.union(
+        v.literal("active"),
+        v.literal("canceled"),
+        v.literal("past_due"),
+        v.literal("none")
+      )
+    ),
+    subscriptionCurrentPeriodEnd: v.optional(v.number()),
   })
     .index("byClerkId", ["clerkId"])
     .index("byEmail", ["email"]),
@@ -19,6 +30,13 @@ export default defineSchema({
     name: v.string(),
     inviteCode: v.string(),           // 6-char uppercase alphanumeric
     defaultCurrency: v.string(),       // ISO 4217, e.g. "USD"
+    type: v.optional(v.union(
+      v.literal("shared-flat"),
+      v.literal("couple"),
+      v.literal("family")
+    )),
+    photoUrl: v.optional(v.string()),
+    address: v.optional(v.string()),
     createdByUserId: v.string(),       // Clerk userId
     createdAt: v.number(),
   }).index("byInviteCode", ["inviteCode"]),
@@ -57,6 +75,7 @@ export default defineSchema({
     ),
     notes: v.optional(v.string()),
     receiptUrl: v.optional(v.string()),
+    photoUrl: v.optional(v.string()),  // Premium: receipt/photo
     createdByUserId: v.string(),
     createdAt: v.number(),
     lastEditedByUserId: v.optional(v.string()),
@@ -96,6 +115,7 @@ export default defineSchema({
     rotationType: v.union(v.literal("fixed"), v.literal("round-robin")),
     assignedMemberIds: v.array(v.string()),   // Clerk userIds
     currentAssigneeIdx: v.number(),           // for round-robin
+    effortPoints: v.optional(v.number()),     // Premium: 1-10 scale
     createdByUserId: v.string(),
     createdAt: v.number(),
   })
@@ -144,18 +164,56 @@ export default defineSchema({
     .index("byHouseholdId", ["householdId"])
     .index("byHouseholdIdByCreatedAt", ["householdId", "createdAt"]),
 
-  // ── Rules ─────────────────────────────────────────────────────────────────
-  rules: defineTable({
+  // ── Shopping Lists ────────────────────────────────────────────────────────
+  shoppingLists: defineTable({
     householdId: v.id("households"),
-    title: v.string(),
-    description: v.optional(v.string()),
-    category: v.string(),              // e.g. "cleaning", "guests", "noise"
-    priority: v.union(
-      v.literal("high"),
-      v.literal("medium"),
-      v.literal("low")
+    name: v.string(),
+    createdByUserId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("byHouseholdId", ["householdId"])
+    .index("byHouseholdIdByCreatedAt", ["householdId", "createdAt"]),
+
+  // ── Shopping Items ────────────────────────────────────────────────────────
+  shoppingItems: defineTable({
+    listId: v.id("shoppingLists"),
+    householdId: v.id("households"),
+    name: v.string(),
+    quantity: v.optional(v.string()),     // Premium: e.g. "2 kg", "1 pack"
+    category: v.optional(v.string()),     // Premium: e.g. "Dairy", "Produce"
+    notes: v.optional(v.string()),        // Premium
+    photoUrl: v.optional(v.string()),     // Premium: product photo
+    boughtByUserId: v.optional(v.string()),
+    boughtAt: v.optional(v.number()),
+    createdByUserId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("byListId", ["listId"])
+    .index("byHouseholdId", ["householdId"])
+    .index("byListIdByCreatedAt", ["listId", "createdAt"]),
+
+  // ── Contracts (Recurring Bills) ───────────────────────────────────────────
+  contracts: defineTable({
+    householdId: v.id("households"),
+    name: v.string(),
+    type: v.union(
+      v.literal("rent"),
+      v.literal("electricity"),
+      v.literal("water"),
+      v.literal("internet"),
+      v.literal("insurance"),
+      v.literal("streaming"),
+      v.literal("other")
     ),
-    agreedByUserIds: v.array(v.string()),
+    amountCents: v.number(),
+    currency: v.string(),
+    frequency: v.union(
+      v.literal("monthly"),
+      v.literal("quarterly"),
+      v.literal("yearly")
+    ),
+    dueDay: v.optional(v.number()),       // 1-31
+    notes: v.optional(v.string()),
     createdByUserId: v.string(),
     createdAt: v.number(),
   })
@@ -176,7 +234,8 @@ export default defineSchema({
       v.literal("member_join"),
       v.literal("member_leave"),
       v.literal("chore_complete"),
-      v.literal("rule_agree")
+      v.literal("shopping_item_buy"),
+      v.literal("contract_create")
     ),
     targetId: v.optional(v.string()),   // ID of affected record
     targetType: v.optional(v.string()), // "expense" | "settlement" | etc.
@@ -189,16 +248,4 @@ export default defineSchema({
     .index("byHouseholdId", ["householdId"])
     .index("byHouseholdIdByCreatedAt", ["householdId", "createdAt"])
     .index("byActorUserId", ["actorUserId"]),
-
-  // ── AI Artifacts (optional, for prompts/outputs) ──────────────────────────
-  aiArtifacts: defineTable({
-    householdId: v.id("households"),
-    userId: v.string(),
-    type: v.union(v.literal("split_suggestion"), v.literal("weekly_summary")),
-    prompt: v.optional(v.string()),
-    output: v.string(),
-    accepted: v.boolean(),
-    createdAt: v.number(),
-  })
-    .index("byHouseholdId", ["householdId"]),
 });

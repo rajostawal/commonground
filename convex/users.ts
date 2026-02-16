@@ -1,6 +1,5 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthenticatedUser } from "./helpers";
 
 export const upsertUser = mutation({
   args: {
@@ -31,7 +30,6 @@ export const upsertUser = mutation({
       email: args.email,
       name: args.name,
       imageUrl: args.imageUrl,
-      aiEnabled: true,
       createdAt: Date.now(),
     });
   },
@@ -50,14 +48,6 @@ export const getMyUser = query({
   },
 });
 
-export const setAiEnabled = mutation({
-  args: { enabled: v.boolean() },
-  handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    await ctx.db.patch(user._id, { aiEnabled: args.enabled });
-  },
-});
-
 export const getUsersByClerkIds = query({
   args: { clerkIds: v.array(v.string()) },
   handler: async (ctx, args) => {
@@ -72,3 +62,61 @@ export const getUsersByClerkIds = query({
     return users.filter(Boolean);
   },
 });
+
+// ── Subscription ──────────────────────────────────────────────────────────────
+
+export const getSubscriptionStatus = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byClerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) return null;
+
+    return {
+      status: user.subscriptionStatus ?? "none",
+      polarCustomerId: user.polarCustomerId ?? null,
+      polarSubscriptionId: user.polarSubscriptionId ?? null,
+      currentPeriodEnd: user.subscriptionCurrentPeriodEnd ?? null,
+    };
+  },
+});
+
+export const updateSubscription = internalMutation({
+  args: {
+    email: v.string(),
+    polarCustomerId: v.string(),
+    polarSubscriptionId: v.string(),
+    subscriptionStatus: v.union(
+      v.literal("active"),
+      v.literal("canceled"),
+      v.literal("past_due"),
+      v.literal("none")
+    ),
+    subscriptionCurrentPeriodEnd: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byEmail", (q) => q.eq("email", args.email))
+      .unique();
+
+    if (!user) {
+      console.error(`Polar webhook: No user found for email ${args.email}`);
+      return;
+    }
+
+    await ctx.db.patch(user._id, {
+      polarCustomerId: args.polarCustomerId,
+      polarSubscriptionId: args.polarSubscriptionId,
+      subscriptionStatus: args.subscriptionStatus,
+      subscriptionCurrentPeriodEnd: args.subscriptionCurrentPeriodEnd,
+    });
+  },
+});
+

@@ -10,14 +10,16 @@
 
 import type * as activityLog from "../activityLog.js";
 import type * as chores from "../chores.js";
+import type * as contracts from "../contracts.js";
 import type * as events from "../events.js";
 import type * as expenses from "../expenses.js";
 import type * as helpers from "../helpers.js";
 import type * as households from "../households.js";
 import type * as memberships from "../memberships.js";
 import type * as messages from "../messages.js";
-import type * as rules from "../rules.js";
 import type * as settlements from "../settlements.js";
+import type * as shoppingItems from "../shoppingItems.js";
+import type * as shoppingLists from "../shoppingLists.js";
 import type * as users from "../users.js";
 
 import type {
@@ -29,14 +31,16 @@ import type {
 declare const fullApi: ApiFromModules<{
   activityLog: typeof activityLog;
   chores: typeof chores;
+  contracts: typeof contracts;
   events: typeof events;
   expenses: typeof expenses;
   helpers: typeof helpers;
   households: typeof households;
   memberships: typeof memberships;
   messages: typeof messages;
-  rules: typeof rules;
   settlements: typeof settlements;
+  shoppingItems: typeof shoppingItems;
+  shoppingLists: typeof shoppingLists;
   users: typeof users;
 }>;
 

@@ -31,7 +31,7 @@ export default function JoinHouseholdPage() {
     try {
       await joinByInviteCode({ inviteCode: normalized });
       toast({ title: "Joined household!", variant: "success" });
-      router.push("/home");
+      router.push("/bulletin-board");
     } catch (err: unknown) {
       const e = err as Error;
       setError(e.message ?? "Invalid invite code");

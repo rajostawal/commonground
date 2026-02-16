@@ -3,37 +3,36 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
-  DollarSign,
+  ClipboardList,
+  ShoppingCart,
   CheckSquare,
-  Calendar,
-  MessageSquare,
-  Megaphone,
-  ScrollText,
-  Users,
+  Wallet,
   Settings,
+  Home as HomeIcon,
   User,
+  Bell,
+  Crown,
   Activity,
+  HelpCircle,
   ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const mainNav = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/expenses", label: "Expenses", icon: DollarSign },
+  { href: "/bulletin-board", label: "Bulletin Board", icon: ClipboardList },
+  { href: "/shopping-list", label: "Shopping List", icon: ShoppingCart },
   { href: "/chores", label: "Chores", icon: CheckSquare },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/finances", label: "Finances", icon: Wallet },
 ];
 
-const moreNav = [
-  { href: "/more/chat", label: "Chat", icon: MessageSquare },
-  { href: "/more/announcements", label: "Announcements", icon: Megaphone },
-  { href: "/more/rules", label: "Rules", icon: ScrollText },
-  { href: "/activity", label: "Activity Log", icon: Activity },
-  { href: "/more/members", label: "Members", icon: Users },
-  { href: "/more/settings", label: "Settings", icon: Settings },
-  { href: "/more/profile", label: "Profile", icon: User },
+const settingsNav = [
+  { href: "/settings/household", label: "Household", icon: HomeIcon },
+  { href: "/settings/profile", label: "Profile", icon: User },
+  { href: "/settings/general", label: "General", icon: Bell },
+  { href: "/settings/premium", label: "Premium", icon: Crown },
+  { href: "/settings/activity-log", label: "Activity Log", icon: Activity },
+  { href: "/settings/support", label: "Support & Legal", icon: HelpCircle },
 ];
 
 function NavItem({
@@ -70,10 +69,12 @@ function NavItem({
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [moreExpanded, setMoreExpanded] = useState(true);
+  const [settingsExpanded, setSettingsExpanded] = useState(
+    pathname.startsWith("/settings")
+  );
 
   function isActive(href: string) {
-    if (href === "/home") return pathname === "/home" || pathname === "/";
+    if (href === "/bulletin-board") return pathname === "/bulletin-board" || pathname === "/";
     return pathname.startsWith(href);
   }
 
@@ -82,7 +83,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 py-4 border-b border-[var(--color-border-subtle)]">
         <div className="h-7 w-7 rounded-md bg-[var(--color-accent)] flex items-center justify-center">
-          <Home className="h-4 w-4 text-white" />
+          <ClipboardList className="h-4 w-4 text-white" />
         </div>
         <span className="text-sm font-semibold text-[var(--color-text-primary)]">CommonGround</span>
       </div>
@@ -102,26 +103,31 @@ export function Sidebar() {
         {/* Separator */}
         <div className="my-2 border-t border-[var(--color-border-subtle)]" />
 
-        {/* More group */}
+        {/* Settings group */}
         <button
-          onClick={() => setMoreExpanded(!moreExpanded)}
+          onClick={() => setSettingsExpanded(!settingsExpanded)}
           className={cn(
             "flex items-center justify-between w-full rounded-md px-2.5 py-2 text-sm font-medium transition-colors",
-            "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]",
+            pathname.startsWith("/settings")
+              ? "bg-[var(--color-accent-muted)] text-[var(--color-accent)]"
+              : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-surface-2)] hover:text-[var(--color-text-primary)]",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-focus)]"
           )}
         >
-          <span>More</span>
+          <span className="flex items-center gap-2.5">
+            <Settings className="h-4 w-4 shrink-0" />
+            Settings
+          </span>
           <ChevronDown
             className={cn(
               "h-3.5 w-3.5 transition-transform",
-              moreExpanded && "rotate-180"
+              settingsExpanded && "rotate-180"
             )}
           />
         </button>
 
-        {moreExpanded &&
-          moreNav.map(({ href, label, icon }) => (
+        {settingsExpanded &&
+          settingsNav.map(({ href, label, icon }) => (
             <NavItem
               key={href}
               href={href}

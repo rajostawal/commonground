@@ -52,7 +52,7 @@ export function BalanceSummary({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Balances</CardTitle>
-          <Link href={`/expenses/settlements`}>
+          <Link href={`/finances/settlements`}>
             <Button variant="ghost" size="sm" className="text-xs gap-1">
               Settlements <ArrowRight className="h-3 w-3" />
             </Button>

@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
+import { PolarCheckoutInit } from "@/components/PolarCheckoutInit";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading: convexAuthLoading } = useConvexAuth();
@@ -49,5 +50,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (isAuthenticated && membership === null) return null;
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <>
+      <PolarCheckoutInit />
+      <AppShell>{children}</AppShell>
+    </>
+  );
 }
