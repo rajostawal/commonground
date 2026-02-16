@@ -9,6 +9,7 @@ export const createItem = mutation({
     quantity: v.optional(v.string()),
     category: v.optional(v.string()),
     notes: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const clerkId = await getClerkId(ctx);
@@ -23,6 +24,7 @@ export const createItem = mutation({
       quantity: args.quantity,
       category: args.category,
       notes: args.notes,
+      tags: args.tags,
       createdByUserId: clerkId,
       createdAt: Date.now(),
     });
@@ -36,6 +38,8 @@ export const updateItem = mutation({
     quantity: v.optional(v.string()),
     category: v.optional(v.string()),
     notes: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    photoUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.itemId);
@@ -56,13 +60,11 @@ export const toggleBought = mutation({
     await requireHouseholdMember(ctx, item.householdId);
 
     if (item.boughtByUserId) {
-      // Unmark as bought
       await ctx.db.patch(args.itemId, {
         boughtByUserId: undefined,
         boughtAt: undefined,
       });
     } else {
-      // Mark as bought
       await ctx.db.patch(args.itemId, {
         boughtByUserId: clerkId,
         boughtAt: Date.now(),
@@ -92,6 +94,16 @@ export const deleteItem = mutation({
   },
 });
 
+export const getById = query({
+  args: { itemId: v.id("shoppingItems") },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.itemId);
+    if (!item) return null;
+    await requireHouseholdMember(ctx, item.householdId);
+    return item;
+  },
+});
+
 export const listByList = query({
   args: { listId: v.id("shoppingLists") },
   handler: async (ctx, args) => {
@@ -106,5 +118,32 @@ export const listByList = query({
       )
       .order("desc")
       .collect();
+  },
+});
+
+/** Return unique item names previously bought in this household (for quick re-add chips). */
+export const recentlyUsedNames = query({
+  args: { householdId: v.id("households") },
+  handler: async (ctx, args) => {
+    await requireHouseholdMember(ctx, args.householdId);
+
+    const items = await ctx.db
+      .query("shoppingItems")
+      .withIndex("byHouseholdId", (q) =>
+        q.eq("householdId", args.householdId)
+      )
+      .order("desc")
+      .take(200);
+
+    // Unique names of bought items, most recent first
+    const seen = new Set<string>();
+    const result: { name: string; category?: string }[] = [];
+    for (const item of items) {
+      if (item.boughtByUserId && !seen.has(item.name.toLowerCase())) {
+        seen.add(item.name.toLowerCase());
+        result.push({ name: item.name, category: item.category });
+      }
+    }
+    return result.slice(0, 20);
   },
 });

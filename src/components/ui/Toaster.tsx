@@ -10,7 +10,7 @@ export function Toaster() {
 
   return (
     <RadixToast.Provider swipeDirection="right">
-      {toasts.map(({ id, title, description, variant, action, actionLabel, onAction, ...props }) => (
+      {toasts.map(({ id, title, description, variant, actionLabel, onAction, ...props }) => (
         <Toast
           key={id}
           title={title}

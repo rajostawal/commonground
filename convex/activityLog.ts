@@ -78,11 +78,13 @@ export const undoAction = mutation({
         .first();
       if (expense) {
         const { _id, _creationTime, ...beforeData } = log.before as Record<string, unknown>;
-        await ctx.db.patch(expense._id, beforeData as Parameters<typeof ctx.db.patch>[1]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await ctx.db.patch(expense._id, beforeData as any);
       }
     } else if (log.type === "expense_delete" && log.before) {
       const { _id, _creationTime, ...beforeData } = log.before as Record<string, unknown>;
-      await ctx.db.insert("expenses", beforeData as Parameters<typeof ctx.db.insert>[1]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await ctx.db.insert("expenses", beforeData as any);
     } else if (log.type === "settlement_create" && log.targetId) {
       const settlement = await ctx.db
         .query("settlements")
@@ -91,7 +93,8 @@ export const undoAction = mutation({
       if (settlement) await ctx.db.delete(settlement._id);
     } else if (log.type === "settlement_delete" && log.before) {
       const { _id, _creationTime, ...beforeData } = log.before as Record<string, unknown>;
-      await ctx.db.insert("settlements", beforeData as Parameters<typeof ctx.db.insert>[1]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await ctx.db.insert("settlements", beforeData as any);
     }
 
     // Mark as undone

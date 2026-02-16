@@ -179,10 +179,11 @@ export default defineSchema({
     listId: v.id("shoppingLists"),
     householdId: v.id("households"),
     name: v.string(),
-    quantity: v.optional(v.string()),     // Premium: e.g. "2 kg", "1 pack"
-    category: v.optional(v.string()),     // Premium: e.g. "Dairy", "Produce"
-    notes: v.optional(v.string()),        // Premium
-    photoUrl: v.optional(v.string()),     // Premium: product photo
+    quantity: v.optional(v.string()),           // Premium: e.g. "2 kg", "1 pack"
+    category: v.optional(v.string()),           // e.g. "Dairy", "Produce"
+    notes: v.optional(v.string()),              // Premium
+    tags: v.optional(v.array(v.string())),      // Premium
+    photoUrl: v.optional(v.string()),           // Premium: custom product photo
     boughtByUserId: v.optional(v.string()),
     boughtAt: v.optional(v.number()),
     createdByUserId: v.string(),
